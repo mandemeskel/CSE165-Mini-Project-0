@@ -176,11 +176,11 @@ Square::Square( Point * point ) {
 void Square::draw() {
 
     // Set the vertex color to be whatever we stored in the point
-    glColor3f(
-        this->origin.r, 
-        this->origin.g, 
-        this->origin.b
-    );
+    // glColor3f(
+    //     this->origin.r, 
+    //     this->origin.g, 
+    //     this->origin.b
+    // );
 
 
     // Draw the lines for the square
@@ -202,9 +202,81 @@ Square::~Square() {
 /*
     Button class definitions
 */
+Button::Button( Point * point, void (*drawLabel)(), void (*callback)() ) : Square( point ) {
 
+    this->origin = *point;
+    this->drawLabel = drawLabel;
+    this->callback = callback;
+
+}
+
+void Button::click() {
+    
+    this->callback();
+
+}
+
+void Button::draw() {
+    
+    this->drawLabel();
+    ((Square*) this )->draw();
+
+}
+
+Button::~Button() {
+
+    
+
+}
 
 
 /*
     Menu class definitions
 */
+Menu::Menu( Point * point ) {
+
+    this->origin = *point;
+    // this->buttons = new vector<Button>;
+    // this->num_btns = 0;
+
+}
+
+void Menu::addButton( Button * btn ) {
+
+    this->buttons.push_back( *btn );
+
+}
+
+// creates horizontal menu of buttons
+void Menu::addButton( void (*drawLabel)(), void (*callback)() ) {
+
+    int num_btns = this->buttons.size() - 1;
+    Point btn_orign( 
+        this->origin.x + LENGTH * num_btns,
+        this->origin.y
+    );
+    Button btn( &btn_orign, drawLabel, callback );
+
+    this->buttons.push_back( btn );
+
+}
+
+void Menu::draw() {
+
+    // for( int n = 0; n < this->num_btns; n++ )
+    for( int n = 0; n < this->buttons.size(); n++ )
+        this->buttons[n].draw();
+
+}
+
+Point Menu::getOrigin() const {
+
+    return this->origin;
+
+}
+
+
+Menu::~Menu() {
+
+
+}

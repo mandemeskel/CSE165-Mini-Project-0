@@ -1,3 +1,5 @@
+#include <vector>
+
 // A point data structure
 struct Point {
 	// The coordinates of the point
@@ -47,6 +49,7 @@ struct Square {
     private:
         static const int sides = 4;
 
+    protected:
         Point origin;    // top left corner
         float length;
 
@@ -69,16 +72,16 @@ struct Square {
 
 struct Button : public Square {
     private:
-        char * label;
+        void (*drawLabel)();
         void (*callback)();
 
     public:
         Button();
         Button( Point * );
-        Button( Point *, char * );
-        Button( Point *, float );
-        Button( Point *, float, char * );
+        Button( Point *, void (*drawLabel)(), void (*callback)() );
         void setCallback( void * );
+        void setDrawLabel( void * );
+        void setLength();
         void click();
         void draw();
         ~Button();
@@ -89,13 +92,17 @@ struct Menu {
 
     private:
         Point origin;
-        Button * buttons;
-        int num_btns;
+        // void * buttons;
+        std::vector<Button> buttons;
+        // int num_btns;
 
     public:
         Menu();
         Menu( Point * );
+        void addButton( Button * );
+        void addButton( void (*drawLabel)(), void (*callback)() );
         void draw();
+        Point getOrigin() const;
         ~Menu();
 
 };
