@@ -18,11 +18,13 @@ struct Point {
 
 };
 
+
 // direction of line
 enum Direction {
     X_AXIS = 'x',
     Y_AXIS = 'y'
 };
+
 
 // what will be drawn on a mouse click
 enum Brush {
@@ -74,11 +76,12 @@ struct Button : public Square {
     private:
         void (*drawLabel)();
         void (*callback)();
+        bool clicked;
 
     public:
         Button();
         Button( Point * );
-        Button( Point *, void (*drawLabel)(), void (*callback)() );
+        Button( Point *, void (*drawLabel)(Point *), void (*callback)() );
         void setCallback( void * );
         void setDrawLabel( void * );
         void setLength();
@@ -100,7 +103,7 @@ struct Menu {
         Menu();
         Menu( Point * );
         void addButton( Button * );
-        void addButton( void (*drawLabel)(), void (*callback)() );
+        void addButton( void (*drawLabel)(Point *), void (*callback)() );
         void draw();
         Point getOrigin() const;
         ~Menu();

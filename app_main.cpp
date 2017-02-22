@@ -21,10 +21,8 @@ using namespace std;
 deque<Point> points;
 deque<Square> squares;
 
-
 // enum that controls what shape is draw on mouse click
 Brush brush = POINT; 
-
 
 // Variables to store current color, initialize to black
 float red = 0.0, green = 0.0, blue = 0.0;

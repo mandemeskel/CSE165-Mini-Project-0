@@ -24,6 +24,8 @@
 using namespace std;
 
 
+
+
 // A constructor for point
 Point::Point() {
     this->x = 0;
@@ -131,14 +133,6 @@ Square::Square( Point * point ) {
     this->origin = *point;
     this->length = LENGTH;
 
-    // for( int n = 0; n < Squar::sides; n++ )
-    //     this->lines[n] = Line( point, this->length, );
-
-    // this->lines[0] = Line( point, this->length, X_AXIS );
-    // this->lines[1] = Line( point, -this->length, Y_AXIS );
-    // this->lines[2] = Line( point, -this->length, X_AXIS );
-    // this->lines[3] = Line( point, this->length, Y_AXIS );
-
     Point * p = new Point( 
         this->origin.x + this->length, 
         this->origin.y - this->length,
@@ -169,8 +163,43 @@ Square::Square( Point * point ) {
         new Point( op.x - this->length, op.y ) 
     );
 
+}
 
+Square::Square( Point * point, float length ) {
 
+    this->origin = *point;
+    this->length = length;
+
+    Point * p = new Point( 
+        this->origin.x + this->length, 
+        this->origin.y - this->length,
+        this->origin.r,
+        this->origin.g,
+        this->origin.b
+    );
+    Point op = *p;
+
+    // top line
+    this->lines[0] = Line( 
+        point, 
+        new Point( this->origin.x + this->length, this->origin.y ) 
+    );
+    // left line
+    this->lines[1] = Line( 
+        point, 
+        new Point( this->origin.x, this->origin.y - this->length )
+    );
+    // right line
+    this->lines[2] = Line( 
+        &op, 
+        new Point( op.x, op.y + this->length )
+    );
+    // bottom line
+    this->lines[3] = Line( 
+        &op, 
+        new Point( op.x - this->length, op.y ) 
+    );
+    
 }
 
 void Square::draw() {
@@ -202,30 +231,32 @@ Square::~Square() {
 /*
     Button class definitions
 */
-Button::Button( Point * point, void (*drawLabel)(), void (*callback)() ) : Square( point ) {
+// Button::Button( Point * point, void (*drawLabel)(Point *), void (*callback)() ) : Square( point ) {
 
-    this->origin = *point;
-    this->drawLabel = drawLabel;
-    this->callback = callback;
+//     this->origin = *point;
+//     this->drawLabel = drawLabel;
+//     this->callback = callback;
+//     this.clicked = false;
 
-}
+// }
 
 void Button::click() {
     
+    this->clicked != this->clicked;
     this->callback();
 
 }
 
 void Button::draw() {
     
-    this->drawLabel();
+    // this->drawLabel( this->origin );
     ((Square*) this )->draw();
 
 }
 
 Button::~Button() {
 
-    
+
 
 }
 
@@ -248,18 +279,18 @@ void Menu::addButton( Button * btn ) {
 }
 
 // creates horizontal menu of buttons
-void Menu::addButton( void (*drawLabel)(), void (*callback)() ) {
+// void Menu::addButton( void (*drawLabel)(Point *), void (*callback)() ) {
 
-    int num_btns = this->buttons.size() - 1;
-    Point btn_orign( 
-        this->origin.x + LENGTH * num_btns,
-        this->origin.y
-    );
-    Button btn( &btn_orign, drawLabel, callback );
+//     int num_btns = this->buttons.size() - 1;
+//     Point btn_orign( 
+//         this->origin.x + LENGTH * num_btns,
+//         this->origin.y
+//     );
+//     Button btn( &btn_orign, drawLabel, callback );
 
-    this->buttons.push_back( btn );
+//     this->buttons.push_back( btn );
 
-}
+// }
 
 void Menu::draw() {
 
@@ -277,6 +308,20 @@ Point Menu::getOrigin() const {
 
 
 Menu::~Menu() {
+
+
+}
+
+
+Menu makeDefaultMenu() {
+
+    Point point( 0, 640 );
+    Menu main( &point );
+
+    // void draqSquareBtnLabel( Point * point ) {
+    // }
+
+    // main.addButton( );
 
 
 }
