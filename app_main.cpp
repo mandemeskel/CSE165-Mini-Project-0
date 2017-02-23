@@ -58,7 +58,7 @@ void appDrawScene() {
 	// Draw a point at the bottom-right
 	glBegin(GL_POINTS);
 
-	glVertex2f(-0.8, -0.8);
+	glVertex2f(-0.625, -0.925);
 
 	glEnd();
 
@@ -156,29 +156,46 @@ void appReshapeFunc(int w, int h) {
 
 
 /**
-	Menu Testing code
+	Menu code
 **/
+// draw square menu button code
 Point pnt( -0.925, -0.875 );
-Point spnt( -0.9, -0.9, 1, 0, 0 );
+Point spnt( -0.9, -0.9, 0.5, 0, 0.5 );
 Square sqr( &spnt, 0.05f );
-void clck() {
+void drawSquareClck() {
 
 	sqr.invertColor();
 	brush = SQUARE;
 
-}	
-void createMenu() {
+}
 
-	// draw square menu button
-	Button draw_square_btn( &pnt, &sqr, SQUARE, &clck );
-	buttons.push_front( draw_square_btn );
-	
-	// draw point menu button
+// draw point menu button code
+Point pnt1( -0.8, -0.875 );
+Point pnt_label( -0.75, -0.925, 0.8, 0.5, 0 );
+void drawPointClck() {
+
+	pnt_label.invertColor();
+	brush = POINT;
 
 }
 
 /**
-	Draws a shape when mouse clicks the canvas
+	Creates the menu button the user can click to change the brush
+**/	
+void createMenu() {
+
+	// draw square menu button
+	Button draw_square_btn( &pnt, &sqr, SQUARE, &drawSquareClck );
+	buttons.push_front( draw_square_btn );
+	
+	// draw point menu button
+	Button draw_point_btn( &pnt1, &pnt_label, POINT, &drawPointClck );
+	buttons.push_front( draw_point_btn );
+
+}
+
+/**
+	Draws a shape when the mouse clicks the canvas
 **/
 void drawOnClick( Point * mouse ) {
     

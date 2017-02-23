@@ -1,7 +1,17 @@
 #include <vector>
 
+
+struct Shape {
+
+    Shape();
+    void invertColor();
+    ~Shape();
+
+};
+
+// TODO: add privacy to this class
 // A point data structure
-struct Point {
+struct Point : public Shape {
 	// The coordinates of the point
 	float x;
 	float y;
@@ -16,6 +26,7 @@ struct Point {
     Point(float x, float y, float r, float g, float b);
     float distance ( Point * ) const;
     void draw() const;
+    void invertColor();
 
 };
 
@@ -34,7 +45,7 @@ enum Brush {
 };
 
 
-struct Line {
+struct Line : public Shape {
     Point start;
     Point end;
     float length;
@@ -50,7 +61,7 @@ struct Line {
 };
 
 
-struct Polygon {
+struct Polygon : public Shape {
     protected:
         Point center;
         Point origin;    // top left corner
@@ -75,6 +86,7 @@ struct Square : public Polygon {
 
         // Lines lines[4];
         Line lines[sides];
+        float half_length;
 
     public:
         Square();
@@ -93,8 +105,8 @@ struct Square : public Polygon {
 struct Button : public Square {
     private:
         // label is a pointer, so that the click event changes to 
-        // the polygon are kept track of
-        Polygon * label;
+        // the shape are kept track of
+        Shape * label;
         Brush label_type;
         void (*drawLabel)();
         void (*callback)();
@@ -103,12 +115,12 @@ struct Button : public Square {
     public:
         Button();
         Button( Point * );
-        Button( Point *, Polygon *, void (*callback)() );
-        Button( Point *, Polygon *, Brush, void (*callback)() );
+        Button( Point *, Shape *, void (*callback)() );
+        Button( Point *, Shape *, Brush, void (*callback)() );
         Button( Point *, void (*drawLabel)(Point *), void (*callback)() );
         void setCallback( void * );
         void setDrawLabel( void * );
-        void setLabel( Polygon * );
+        void setLabel( Shape * );
         void setLength();
         void click();
         const bool isClicked( Point *, bool );

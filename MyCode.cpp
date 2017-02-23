@@ -24,6 +24,13 @@
 using namespace std;
 
 
+/**
+    Shape class definitions
+**/
+Shape::Shape() {
+}
+Shape::~Shape() {
+}
 
 
 // A constructor for point
@@ -71,6 +78,12 @@ void Point::draw() const {
     glVertex2f(this->x, this->y);
 
     glEnd();
+}
+
+void Point::invertColor() {
+    this->r = abs( this->r - 1 );
+    this->g = abs( this->g - 1 );
+    this->b = abs( this->b - 1 );
 }
 
 
@@ -201,6 +214,11 @@ Square::Square( float x, float y ) {
 
     this->origin = Point( x, y );
     this->length = LENGTH;
+    this->half_length = this->length/2;
+    this->center = Point( 
+        this->origin.x + this->half_length,
+        this->origin.y - this->half_length
+    );
 
 }
 
@@ -209,12 +227,13 @@ Square::Square( Point * point ) {
     this->origin = *point;
     this->length = LENGTH;
 
-    // create center point of square for click testing
-    float half_len = this->length/2;
+    // create center point of square
+    this->half_length = this->length/2;
     this->center = Point( 
-        this->origin.x + half_len,
-        this->origin.y + half_len
+        this->origin.x + this->half_length,
+        this->origin.y - this->half_length
     );
+
 
     Point * p = new Point( 
         this->origin.x + this->length, 
@@ -252,6 +271,13 @@ Square::Square( Point * point, float length ) {
 
     this->origin = *point;
     this->length = length;
+
+    // create center point of square
+    this->half_length = this->length/2;
+    this->center = Point( 
+        this->origin.x + this->half_length,
+        this->origin.y - this->half_length
+    );
 
     Point * p = new Point( 
         this->origin.x + this->length, 
@@ -313,27 +339,29 @@ Square::~Square() {
 /*
     Button class definitions
 */
-Button::Button( Point * point, Polygon * polygon, void (*callback)() ) : Square( point ) {
+Button::Button( Point * point, Shape * shape, void (*callback)() ) : Square( point ) {
 
     this->origin = *point;
     // label is a pointer, so that the click event changes to 
-    // the polygon are kept track of
-    this->label = polygon;
+    // the shape are kept track of
+    this->label = shape;
     this->callback = callback;
     this->clicked = false;
     this->label_type = SQUARE;
+    // this->half_length = this->length / 2;
 
 }
 
-Button::Button( Point * point, Polygon * polygon, Brush polygon_type, void (*callback)() ) : Square( point ) {
+Button::Button( Point * point, Shape * shape, Brush shape_type, void (*callback)() ) : Square( point ) {
 
     this->origin = *point;
     // label is a pointer, so that the click event changes to 
-    // the polygon are kept track of
-    this->label = polygon;
+    // the shape are kept track of
+    this->label = shape;
     this->callback = callback;
     this->clicked = false;
-    this->label_type = polygon_type;
+    this->label_type = shape_type;
+    // this->half_length = this->length / 2;
 
 }
 
@@ -368,19 +396,19 @@ void Button::draw() {
 
 }
 
-void Button::setLabel( Polygon * polygon ) {
+void Button::setLabel( Shape * shape ) {
 
-    this->label = polygon;
+    this->label = shape;
 
 }
 
 const bool Button::isClicked( Point * mouse, bool if_clicked_do_click = false ) {
 
-    this->clicked = this->origin.distance( mouse ) < this->length;
+    this->clicked = this->center.distance( mouse ) < this->half_length;
 
     if( if_clicked_do_click && this->clicked ) {
         this->click();
-		cout << "clicked " << this->origin.distance( mouse ) << " len: " << this->length << endl;
+		// cout << "clicked " << this->center.distance( mouse ) << " len: " << this->length << endl;
     }
 
     return this->clicked;
