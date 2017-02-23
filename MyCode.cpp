@@ -339,6 +339,16 @@ Square::~Square() {
 /*
     Button class definitions
 */
+Button::Button( Point * point ) : Square( point ) {
+
+    this->origin = *point;
+    this->label = NULL;
+    this->callback = NULL;
+    this->clicked = false;
+    // this->label_type = NULL;
+
+}
+
 Button::Button( Point * point, Shape * shape, void (*callback)() ) : Square( point ) {
 
     this->origin = *point;
@@ -377,7 +387,9 @@ Button::Button( Point * point, Shape * shape, Brush shape_type, void (*callback)
 void Button::click() {
     
     this->clicked != this->clicked;
-    this->callback();
+    if( this->callback )
+        this->callback();
+    
     this->invertColor();
 
 }

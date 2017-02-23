@@ -205,7 +205,8 @@ void drawOnClick( Point * mouse ) {
         points.push_front( *mouse );
     else if( brush == SQUARE )
         // Draw a squares
-        squares.push_front( Square( mouse ) );
+        // squares.push_front( Square( mouse ) );
+		buttons.push_front( Button( mouse ) );
 
 }
 
