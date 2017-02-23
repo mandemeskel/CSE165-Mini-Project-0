@@ -133,6 +133,7 @@ void Line::draw() {
 
 }
 
+// draws a line with user specific color
 void Line::draw( Point * color ) {
 
     glColor3f( color->r, color->g, color->b );
@@ -145,6 +146,7 @@ void Line::draw( Point * color ) {
 
 }
 
+// draws line but supress the line's inherit color
 void Line::draw( bool supress_color = false ) {
 
     // hide the lines natural color, this is for polygons
@@ -161,6 +163,7 @@ void Line::draw( bool supress_color = false ) {
 
 }
 
+// updates the color of a line
 void Line::updateColor( Point * color ) {
 
     this->start.r = color->r;
@@ -171,9 +174,6 @@ void Line::updateColor( Point * color ) {
 
 
 Line::~Line() {
-
-    // free( this->start );
-    // free( this->end );
 
 }
 
@@ -197,12 +197,6 @@ void Polygon::invertColor() {
     this->origin.r = abs( this->origin.r - 1 );
     this->origin.g = abs( this->origin.g - 1 );
     this->origin.b = abs( this->origin.b - 1 );
-
-    // update colors of the polygon's lines
-    // TODO: this fails for some reason, buttons color does not get updated
-    // on cick
-    // for( int n = 0; n < this->sides; n++ )
-    //     this->lines[n].updateColor( &this->origin );
     
 }
 
@@ -234,7 +228,7 @@ Square::Square( Point * point ) {
         this->origin.y - this->half_length
     );
 
-
+    // creates the lines for the square
     Point * p = new Point( 
         this->origin.x + this->length, 
         this->origin.y - this->length,
@@ -279,6 +273,7 @@ Square::Square( Point * point, float length ) {
         this->origin.y - this->half_length
     );
 
+    // creates the lines for the square
     Point * p = new Point( 
         this->origin.x + this->length, 
         this->origin.y - this->length,
@@ -324,14 +319,9 @@ void Square::draw() {
     for( int n = 0; n < Square::sides; n++ )
         this->lines[n].draw( true );
 
-    // cout << "drawing square" << this->length << endl;
-
 }
 
 Square::~Square() {
-
-    // for( int n = 0; n < Square::sides; n++ )
-    //     free( this->lines[n] );
 
 }
 
@@ -345,7 +335,6 @@ Button::Button( Point * point ) : Square( point ) {
     this->label = NULL;
     this->callback = NULL;
     this->clicked = false;
-    // this->label_type = NULL;
 
 }
 
@@ -358,7 +347,6 @@ Button::Button( Point * point, Shape * shape, void (*callback)() ) : Square( poi
     this->callback = callback;
     this->clicked = false;
     this->label_type = SQUARE;
-    // this->half_length = this->length / 2;
 
 }
 
@@ -371,18 +359,8 @@ Button::Button( Point * point, Shape * shape, Brush shape_type, void (*callback)
     this->callback = callback;
     this->clicked = false;
     this->label_type = shape_type;
-    // this->half_length = this->length / 2;
 
 }
-
-// Button::Button( Point * point, void (*drawLabel)(Point *), void (*callback)() ) : Square( point ) {
-
-//     this->origin = *point;
-//     this->drawLabel = drawLabel;
-//     this->callback = callback;
-//     this->clicked = false;
-
-// }
 
 void Button::click() {
     
@@ -397,13 +375,11 @@ void Button::click() {
 void Button::draw() {
     
     // call square draw last for it to be in the  background
-    // this->drawLabel( this->origin );
     if( this->label_type == SQUARE )
         ((Square*)this->label )->draw();
     else if( this->label_type == POINT )
         ((Point*)this->label )->draw();
 
-    // this->label->draw();
     ((Square*) this )->draw();
 
 }
@@ -414,13 +390,14 @@ void Button::setLabel( Shape * shape ) {
 
 }
 
+// checks if the button is clicked if it is and if_clicked_do_click is
+// true than call the click function of the button
 const bool Button::isClicked( Point * mouse, bool if_clicked_do_click = false ) {
 
     this->clicked = this->center.distance( mouse ) < this->half_length;
 
     if( if_clicked_do_click && this->clicked ) {
         this->click();
-		// cout << "clicked " << this->center.distance( mouse ) << " len: " << this->length << endl;
     }
 
     return this->clicked;
@@ -431,56 +408,6 @@ Button::~Button() {
 
 }
 
-
-/*
-    Menu class definitions
-*/
-Menu::Menu( Point * point ) {
-
-    this->origin = *point;
-    // this->buttons = new vector<Button>;
-    // this->num_btns = 0;
-
-}
-
-void Menu::addButton( Button * btn ) {
-
-    this->buttons.push_back( *btn );
-
-}
-
-// creates horizontal menu of buttons
-// void Menu::addButton( void (*drawLabel)(Point *), void (*callback)() ) {
-
-//     int num_btns = this->buttons.size() - 1;
-//     Point btn_orign( 
-//         this->origin.x + LENGTH * num_btns,
-//         this->origin.y
-//     );
-//     Button btn( &btn_orign, drawLabel, callback );
-
-//     this->buttons.push_back( btn );
-
-// }
-
-void Menu::draw() {
-
-    // for( int n = 0; n < this->num_btns; n++ )
-    for( int n = 0; n < this->buttons.size(); n++ )
-        this->buttons[n].draw();
-
-}
-
-Point Menu::getOrigin() const {
-
-    return this->origin;
-
-}
-
-Menu::~Menu() {
-
-
-}
 
 
 

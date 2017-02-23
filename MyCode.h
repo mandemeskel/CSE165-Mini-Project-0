@@ -83,8 +83,6 @@ struct Square : public Polygon {
         static const int sides = 4;
 
     protected:
-
-        // Lines lines[4];
         Line lines[sides];
         float half_length;
 
@@ -97,7 +95,6 @@ struct Square : public Polygon {
         void draw();
         void setLength( float size );
         float getLength();
-        // static deque<Square> squares;
         ~Square();
 };
 
@@ -117,7 +114,6 @@ struct Button : public Square {
         Button( Point * );
         Button( Point *, Shape *, void (*callback)() );
         Button( Point *, Shape *, Brush, void (*callback)() );
-        Button( Point *, void (*drawLabel)(Point *), void (*callback)() );
         void setCallback( void * );
         void setDrawLabel( void * );
         void setLabel( Shape * );

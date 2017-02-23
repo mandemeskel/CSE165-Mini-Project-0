@@ -17,17 +17,14 @@
 using namespace std;
 
 
-// enum that controls what shape is draw on mouse click
+// enum that controls what shape is drawen on mouse click
 Brush brush = POINT; 
-
 
 // Some global variables to maintain state
 // A "Double Ended QUEue" to store points 
 deque<Point> points;
 deque<Square> squares;
 deque<Button> buttons;
-
-
 
 // Variables to store current color, initialize to black
 float red = 0.0, green = 0.0, blue = 0.0;
@@ -179,9 +176,7 @@ void drawPointClck() {
 
 }
 
-/**
-	Creates the menu button the user can click to change the brush
-**/	
+// Creates the menu button the user can click to change the brush
 void createMenu() {
 
 	// draw square menu button
@@ -193,6 +188,7 @@ void createMenu() {
 	buttons.push_front( draw_point_btn );
 
 }
+
 
 /**
 	Draws a shape when the mouse clicks the canvas
@@ -375,7 +371,7 @@ int main(int argc, char** argv) {
 	// Set callback to handle keyboad events
 	glutKeyboardFunc(appKeyboardFunc);
 
-	// menu init
+	// creates the menu
 	createMenu();
 
 	// Start the main loop
