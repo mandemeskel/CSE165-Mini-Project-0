@@ -15,6 +15,7 @@ struct Point {
     Point( float, float );
     Point(float x, float y, float r, float g, float b);
     float distance ( Point * ) const;
+    void draw() const;
 
 };
 
@@ -42,18 +43,35 @@ struct Line {
     Line( Point *, Point * );
     Line( Point *, float, Direction );
     void draw();
+    void draw( Point * );
+    void draw( bool );
+    void updateColor( Point * );
     ~Line();
 };
 
 
-struct Square {
+struct Polygon {
+    protected:
+        Point center;
+        Point origin;    // top left corner
+        float length;
+        static const int sides = 0;
+        Line lines[sides];
+
+    public:
+        Polygon();
+        void draw();
+        void invertColor();
+
+};
+
+
+struct Square : public Polygon {
 
     private:
         static const int sides = 4;
 
     protected:
-        Point origin;    // top left corner
-        float length;
 
         // Lines lines[4];
         Line lines[sides];
@@ -74,6 +92,10 @@ struct Square {
 
 struct Button : public Square {
     private:
+        // label is a pointer, so that the click event changes to 
+        // the polygon are kept track of
+        Polygon * label;
+        Brush label_type;
         void (*drawLabel)();
         void (*callback)();
         bool clicked;
@@ -81,11 +103,15 @@ struct Button : public Square {
     public:
         Button();
         Button( Point * );
+        Button( Point *, Polygon *, void (*callback)() );
+        Button( Point *, Polygon *, Brush, void (*callback)() );
         Button( Point *, void (*drawLabel)(Point *), void (*callback)() );
         void setCallback( void * );
         void setDrawLabel( void * );
+        void setLabel( Polygon * );
         void setLength();
         void click();
+        const bool isClicked( Point *, bool );
         void draw();
         ~Button();
 };

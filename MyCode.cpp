@@ -51,7 +51,7 @@ Point::Point(float x, float y, float r, float g, float b) {
     this->b = b;
 }
 
-float Point::distance ( Point * point ) const {
+float Point::distance( Point * point ) const {
 
     float x_diff = this->x - point->x;
     float y_diff = this->y - point->y;
@@ -59,6 +59,18 @@ float Point::distance ( Point * point ) const {
 
     return sqrt( sum );
 
+}
+
+void Point::draw() const {
+    // Set the vertex color to be whatever we stored in the point
+    glColor3f(this->r, this->g, this->b);
+
+    glBegin(GL_POINTS);
+
+    // Draw the vertex in the right position
+    glVertex2f(this->x, this->y);
+
+    glEnd();
 }
 
 
@@ -108,6 +120,43 @@ void Line::draw() {
 
 }
 
+void Line::draw( Point * color ) {
+
+    glColor3f( color->r, color->g, color->b );
+    glBegin( GL_LINES );
+
+    glVertex2f( this->start.x, this->start.y );
+    glVertex2f( this->end.x, this->end.y );
+
+    glEnd();
+
+}
+
+void Line::draw( bool supress_color = false ) {
+
+    // hide the lines natural color, this is for polygons
+    // who want to control their color
+    if( !supress_color )
+        glColor3f( this->start.r, this->start.g, this->start.b );
+    
+    glBegin( GL_LINES );
+
+    glVertex2f( this->start.x, this->start.y );
+    glVertex2f( this->end.x, this->end.y );
+
+    glEnd();
+
+}
+
+void Line::updateColor( Point * color ) {
+
+    this->start.r = color->r;
+    this->start.g = color->g;
+    this->start.b = color->b;
+
+}
+
+
 Line::~Line() {
 
     // free( this->start );
@@ -116,6 +165,33 @@ Line::~Line() {
 }
 
 
+/**
+    Polygon Class Definitions
+**/
+Polygon::Polygon() {
+
+    this->origin = Point( 0, 0 );
+    this->length = 0;
+
+}
+
+void Polygon::draw() {
+
+}
+
+void Polygon::invertColor() {
+
+    this->origin.r = abs( this->origin.r - 1 );
+    this->origin.g = abs( this->origin.g - 1 );
+    this->origin.b = abs( this->origin.b - 1 );
+
+    // update colors of the polygon's lines
+    // TODO: this fails for some reason, buttons color does not get updated
+    // on cick
+    // for( int n = 0; n < this->sides; n++ )
+    //     this->lines[n].updateColor( &this->origin );
+    
+}
 
 
 /**
@@ -132,6 +208,13 @@ Square::Square( Point * point ) {
 
     this->origin = *point;
     this->length = LENGTH;
+
+    // create center point of square for click testing
+    float half_len = this->length/2;
+    this->center = Point( 
+        this->origin.x + half_len,
+        this->origin.y + half_len
+    );
 
     Point * p = new Point( 
         this->origin.x + this->length, 
@@ -205,16 +288,17 @@ Square::Square( Point * point, float length ) {
 void Square::draw() {
 
     // Set the vertex color to be whatever we stored in the point
-    // glColor3f(
-    //     this->origin.r, 
-    //     this->origin.g, 
-    //     this->origin.b
-    // );
-
+    glColor3f(
+        this->origin.r, 
+        this->origin.g, 
+        this->origin.b
+    );
 
     // Draw the lines for the square
     for( int n = 0; n < Square::sides; n++ )
-        this->lines[n].draw();
+        this->lines[n].draw( true );
+
+    // cout << "drawing square" << this->length << endl;
 
 }
 
@@ -226,17 +310,39 @@ Square::~Square() {
 }
 
 
-
-
 /*
     Button class definitions
 */
+Button::Button( Point * point, Polygon * polygon, void (*callback)() ) : Square( point ) {
+
+    this->origin = *point;
+    // label is a pointer, so that the click event changes to 
+    // the polygon are kept track of
+    this->label = polygon;
+    this->callback = callback;
+    this->clicked = false;
+    this->label_type = SQUARE;
+
+}
+
+Button::Button( Point * point, Polygon * polygon, Brush polygon_type, void (*callback)() ) : Square( point ) {
+
+    this->origin = *point;
+    // label is a pointer, so that the click event changes to 
+    // the polygon are kept track of
+    this->label = polygon;
+    this->callback = callback;
+    this->clicked = false;
+    this->label_type = polygon_type;
+
+}
+
 // Button::Button( Point * point, void (*drawLabel)(Point *), void (*callback)() ) : Square( point ) {
 
 //     this->origin = *point;
 //     this->drawLabel = drawLabel;
 //     this->callback = callback;
-//     this.clicked = false;
+//     this->clicked = false;
 
 // }
 
@@ -244,19 +350,44 @@ void Button::click() {
     
     this->clicked != this->clicked;
     this->callback();
+    this->invertColor();
 
 }
 
 void Button::draw() {
     
+    // call square draw last for it to be in the  background
     // this->drawLabel( this->origin );
+    if( this->label_type == SQUARE )
+        ((Square*)this->label )->draw();
+    else if( this->label_type == POINT )
+        ((Point*)this->label )->draw();
+
+    // this->label->draw();
     ((Square*) this )->draw();
 
 }
 
+void Button::setLabel( Polygon * polygon ) {
+
+    this->label = polygon;
+
+}
+
+const bool Button::isClicked( Point * mouse, bool if_clicked_do_click = false ) {
+
+    this->clicked = this->origin.distance( mouse ) < this->length;
+
+    if( if_clicked_do_click && this->clicked ) {
+        this->click();
+		cout << "clicked " << this->origin.distance( mouse ) << " len: " << this->length << endl;
+    }
+
+    return this->clicked;
+
+}
+
 Button::~Button() {
-
-
 
 }
 
@@ -306,22 +437,10 @@ Point Menu::getOrigin() const {
 
 }
 
-
 Menu::~Menu() {
 
 
 }
 
 
-Menu makeDefaultMenu() {
 
-    Point point( 0, 640 );
-    Menu main( &point );
-
-    // void draqSquareBtnLabel( Point * point ) {
-    // }
-
-    // main.addButton( );
-
-
-}

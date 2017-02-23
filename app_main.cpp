@@ -16,13 +16,18 @@
 
 using namespace std;
 
+
+// enum that controls what shape is draw on mouse click
+Brush brush = POINT; 
+
+
 // Some global variables to maintain state
 // A "Double Ended QUEue" to store points 
 deque<Point> points;
 deque<Square> squares;
+deque<Button> buttons;
 
-// enum that controls what shape is draw on mouse click
-Brush brush = POINT; 
+
 
 // Variables to store current color, initialize to black
 float red = 0.0, green = 0.0, blue = 0.0;
@@ -57,27 +62,24 @@ void appDrawScene() {
 
 	glEnd();
 
-
-
 	// Draw all the points stored in the double-ended queue
 	for (int i = 0; i < points.size(); i++) {
 
-		// Set the vertex color to be whatever we stored in the point
-		glColor3f(points[i].r, points[i].g, points[i].b);
+		points[i].draw();
 
-		glBegin(GL_POINTS);
-
-		// Draw the vertex in the right position
-		glVertex2f(points[i].x, points[i].y);
-
-		glEnd();
 	}
-
 
 	// Draw all squares
 	for( int n = 0; n < squares.size(); n++ ) {
 
 		squares[n].draw();
+
+	}
+
+	// Draw all buttons
+	for( int n = 0; n < buttons.size(); n++ ) {
+
+		buttons[n].draw();
 
 	}
 
@@ -153,6 +155,44 @@ void appReshapeFunc(int w, int h) {
 }
 
 
+/**
+	Menu Testing code
+**/
+Point pnt( -0.925, -0.875 );
+Point spnt( -0.9, -0.9, 1, 0, 0 );
+Square sqr( &spnt, 0.05f );
+void clck() {
+
+	sqr.invertColor();
+	brush = SQUARE;
+
+}	
+void createMenu() {
+
+	// draw square menu button
+	Button draw_square_btn( &pnt, &sqr, SQUARE, &clck );
+	buttons.push_front( draw_square_btn );
+	
+	// draw point menu button
+
+}
+
+/**
+	Draws a shape when mouse clicks the canvas
+**/
+void drawOnClick( Point * mouse ) {
+    
+    if( brush == POINT )
+        // Add a point with with coordinates matching the
+        // current mouse position, and the current color values
+        points.push_front( *mouse );
+    else if( brush == SQUARE )
+        // Draw a squares
+        squares.push_front( Square( mouse ) );
+
+}
+
+
 //-------------------------------------------------------
 // A function to handle mouse clicks
 // Called every time the mouse button goes up or down
@@ -169,19 +209,27 @@ void appMouseFunc(int b, int s, int x, int y) {
 	windowToScene(mx, my);
 
 	Point point = Point(mx, my, red, green, blue);
+	bool btn_clicked = false;
 
-	if( brush == POINT )
-		// Add a point with with coordinates matching the
-		// current mouse position, and the current color values
-		points.push_front( point );
-	else if( brush == SQUARE )
-		// Draw a squares
-		squares.push_front( Square( &point ) );
+	// check if any of our buttons are clicked
+	for( int n = 0; n < buttons.size(); n++ ) {
+
+		btn_clicked = buttons[n].isClicked( &point, true );
+		
+		// only evalute one click for one button
+		if( btn_clicked ) break;
+
+	}
+
+	// don't draw when button is clicked
+	if( !btn_clicked )
+		drawOnClick( &point );
 
 	// Redraw the scene by calling appDrawScene above
 	// so that the point we added above will get painted
 	glutPostRedisplay();
 }
+
 
 //-------------------------------------------------------
 // A function to handle mouse dragging
@@ -265,6 +313,12 @@ void appKeyboardFunc(unsigned char key, int x, int y) {
 	case 'S':
 		brush = SQUARE;
 		break;
+
+		// The 'p' key was pressed. Draw squares on mouse click
+	case 'p':
+	case 'P':
+		brush = POINT;
+		break;
 	}
 
 	// After all the state changes, redraw the scene
@@ -302,6 +356,9 @@ int main(int argc, char** argv) {
 
 	// Set callback to handle keyboad events
 	glutKeyboardFunc(appKeyboardFunc);
+
+	// menu init
+	createMenu();
 
 	// Start the main loop
 	glutMainLoop();
